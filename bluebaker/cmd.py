@@ -42,7 +42,7 @@ class Command(object):
         info(' === Program start ===')
 
     def prepere_app(self):
-        self.app().initDatabase()
+        self.app().additionMethod()
         self.app().initQtApp()
 
     def run(self):

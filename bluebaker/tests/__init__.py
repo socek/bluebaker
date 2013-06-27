@@ -1,10 +1,12 @@
 from sys import argv
-
 import logging
 import unittest
+from os import path
+
 import venusian
 
 from bluebaker.tests.base import TestCase
+import bluebaker
 
 
 def import_tests(module):
@@ -13,7 +15,7 @@ def import_tests(module):
     scanner.scan(module, categories=('tests',))
 
 
-def get_all_test_suite(module, tests):
+def get_all_test_suite(module=bluebaker, tests=[]):
     def prepere_all_test_cases(suite):
         test_cases = []
         for test_case in TestCase.alltests:
@@ -38,11 +40,17 @@ def get_all_test_suite(module, tests):
         return test_cases
 
     def start_logging():
+        # TODO: log file should be in settings
         from bluebaker.log import start_test_logging
+        if path.exists('data'):
+            filename = 'data/test.log'
+        else:
+            filename = 'test.log'
+
         logging.basicConfig(
             level=logging.INFO,
             format="%(asctime)-15s:%(message)s",
-            filename='data/test.log'
+            filename=filename,
         )
         logging.getLogger('finlog').info('\n\t*** TESTING STARTED ***')
         start_test_logging()

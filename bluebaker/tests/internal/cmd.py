@@ -26,7 +26,7 @@ class ApplicationMock(ClassMockup):
         super(ApplicationMock, self).__init__(test)
         self.add_method('set_debug')
         self.add_method('make_settings')
-        self.add_method('initDatabase')
+        self.add_method('additionMethod')
         self.add_method('initQtApp')
         self.add_method('run')
 
@@ -35,7 +35,7 @@ class CmdTest(TestCase):
 
     def setUp(self):
         super(CmdTest, self).setUp()
-        self.cmd = Command()
+        self.cmd = Command(None, None)
         self.app = ApplicationMock(self)
         self.cmd.app = lambda: self.app
 
@@ -50,7 +50,7 @@ class CmdTest(TestCase):
     def test_prepere_app(self):
         self.cmd.prepere_app()
 
-        self.app.assertMethod('initDatabase')
+        self.app.assertMethod('additionMethod')
         self.app.assertMethod('initQtApp')
 
     def test_parse_arguments(self):

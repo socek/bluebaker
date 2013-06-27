@@ -4,6 +4,7 @@ from mock import patch
 from bluebaker.tests.base import TestCase
 from bluebaker.app import Application
 from bluebaker.singleton import Singleton
+from bluebaker.tests.mocker import ClassMockup
 
 
 class QtAppMock(object):
@@ -24,9 +25,17 @@ class QtAppMock(object):
         return result
 
 
+class SettingsMock(ClassMockup):
+
+    def __init__(self, test):
+        super(SettingsMock, self).__init__(test)
+        self.add_method('make_settings')
+
+
 class MainAppTest(TestCase):
 
     def setUp(self):
+        super(MainAppTest, self).setUp()
         self._instances = Singleton._instances
         Singleton._instances = {}
 
@@ -49,24 +58,23 @@ class MainAppTest(TestCase):
         self.assertEqual(True, app.debug)
 
     def test_make_settings(self):
+        settings = SettingsMock(self)
         app = Application()
+        app.modules = {
+            'settings': settings,
+        }
         app.make_settings()
 
-        self.assertEqual(dict, type(app.settings))
-        self.assertEqual('finlog', app.settings['project_name'])
-        self.assertTrue('paths' in app.settings)
+        settings.assertMethod('make_settings')
 
-    def test_initDatabase(self):
+    def test_additionMethod(self):
         app = Application()
         app.settings = {
-            'dbpath': 'unrelevant',
+            'additionMethod': self.generateMock('name')[1]
         }
 
-        with patch('cdborm.connection.connec_to_database') as mock:
-            mock.return_value = (1, 2)
-            app.initDatabase()
-
-            self.assertEqual(1, app.db)
+        app.additionMethod()
+        self.assertMock('name', app)
 
     def test_initQtApp(self):
         # I can not test if the QApplication was sucessfully initalized.

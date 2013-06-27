@@ -1,9 +1,11 @@
 from mock import patch
 import logging
 
+import bluebaker
 from bluebaker.tests.base import TestCase
 from bluebaker.tests.mocker import ClassMockup
 from bluebaker import log
+from bluebaker.app import Application
 
 
 class LogMock(ClassMockup):
@@ -27,11 +29,12 @@ class TestLogClassTest(TestCase):
             loger.assertLog('test2')
 
     def test_debug(self):
+        Application().set_main_module(bluebaker, None)
         log.debug('test3')
         with self.log.tester(self, 'debug') as loger:
             # number in the line belowe should be the line number of the
             # "log.debug" line
-            loger.assertLog('./main/tests/internal/log.py:30 test3')
+            loger.assertLog('./tests/internal/log.py:33 test3')
 
     def test_error(self):
         log.error('test4')

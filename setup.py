@@ -3,7 +3,6 @@ from setuptools import setup, find_packages
 
 install_requires = [
     'smallsettings',
-    'CodernityDB-orm',
     'formskit',
     'venusian',
     'gevent',
@@ -27,5 +26,5 @@ if __name__ == '__main__':
           packages=find_packages(),
           install_requires=install_requires,
           dependency_links=dependency_links,
-          test_suite='bluebaker.test.get_all_test_suite',
+          test_suite='bluebaker.tests.get_all_test_suite',
           )

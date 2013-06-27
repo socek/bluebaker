@@ -2,7 +2,6 @@
 from PySide import QtGui
 
 from bluebaker.app import Application
-from bluebaker.topwindow.menugenerator import TopMenuGenerator
 
 
 class TopWindow(QtGui.QMainWindow):
@@ -20,7 +19,8 @@ class TopWindow(QtGui.QMainWindow):
             self.setCentralWidget(self._mdi_area)
 
         def createMenu():
-            TopMenuGenerator(self)
+            if Application().settings:
+                Application().settings['buttonsGenerator'](self)
 
         def createSatusBar():
             self.status = QtGui.QStatusBar(self)

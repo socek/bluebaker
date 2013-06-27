@@ -18,7 +18,7 @@ class Application(object):
         self.running = True
         self.settings = None
         self.db = None
-        self.module = None
+        self.modules = None
 
     def set_main_module(self, main, settings):
         self.modules = {
@@ -43,9 +43,13 @@ class Application(object):
                 self.sleep()
             self.sleep(0.01)
 
-    def initDatabase(self):
-        from cdborm.connection import connec_to_database
-        self.db, inited = connec_to_database(self.settings['dbpath'], True)
+    def additionMethod(self):
+        if self.settings and 'additionMethod' in self.settings:
+            self.settings['additionMethod'](self)
+
+    # def initDatabase(self):
+    #     from cdborm.connection import connec_to_database
+    #     self.db, inited = connec_to_database(self.settings['dbpath'], True)
 
     def initQtApp(self):
         self.qtApp = QApplication(sys.argv)
