@@ -19,8 +19,8 @@ class TopWindow(QtGui.QMainWindow):
             self.setCentralWidget(self._mdi_area)
 
         def createMenu():
-            if Application().settings:
-                Application().settings['buttonsGenerator'](self)
+            if Application().settings and 'TopMenuGenerator' in Application().settings:
+                Application().settings['TopMenuGenerator'](self)
 
         def createSatusBar():
             self.status = QtGui.QStatusBar(self)

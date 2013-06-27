@@ -47,10 +47,6 @@ class Application(object):
         if self.settings and 'additionMethod' in self.settings:
             self.settings['additionMethod'](self)
 
-    # def initDatabase(self):
-    #     from cdborm.connection import connec_to_database
-    #     self.db, inited = connec_to_database(self.settings['dbpath'], True)
-
     def initQtApp(self):
         self.qtApp = QApplication(sys.argv)
 
