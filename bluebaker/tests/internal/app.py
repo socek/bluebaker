@@ -83,7 +83,7 @@ class MainAppTest(TestCase):
         self.assertRaises(RuntimeError, app.initQtApp)
 
     def test_createMainWindow(self):
-        from bluebaker.topwindow.window import TopWindow
+        from bluebaker.topwindow import TopWindow
         app = Application()
         app.createTopWindow()
 

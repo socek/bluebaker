@@ -55,7 +55,7 @@ class Application(object):
         self.qtApp = QApplication(sys.argv)
 
     def createTopWindow(self):
-        from bluebaker.topwindow.window import TopWindow
+        from bluebaker.topwindow import TopWindow
         self.main = TopWindow()
         self.main.show()
 

@@ -1,7 +1,7 @@
 from mock import patch, MagicMock
 from PySide.QtGui import QMdiArea, QMenuBar, QStatusBar
 
-from bluebaker.topwindow.window import TopWindow
+from bluebaker.topwindow import TopWindow
 from bluebaker.tests.base import TestCase
 from bluebaker.singleton import Singleton
 
