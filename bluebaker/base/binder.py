@@ -36,6 +36,9 @@ class Binder(BaseBinder):
 
     def hide_all(self, except_name=None):
         super(Binder, self).hide_all(except_name)
+        return self.update_size_with_delay()
+
+    def update_size_with_delay(self):
         return spawn(lambda: self.update_size())  # I know this is dirty,
                                      # but I do not know to make it better
 

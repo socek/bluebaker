@@ -104,7 +104,11 @@ class FormViewBase(View):
             'form_name': self.form.name,
         }
         for name, inputs in self._inputs.items():
-            data[name] = self._get_field_values(name)
+            values = self._get_field_values(name)
+            if len(values) == 1:
+                data[name] = values[0]
+            else:
+                data[name] = values
         return data
 
     def _set_field_value(self, name, value, index=0):
