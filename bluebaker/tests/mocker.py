@@ -11,11 +11,13 @@ class ClassMockup(object):
         self.test.assertEqual(args, self._data[name][0])
         self.test.assertEqual(kwargs, self._data[name][1])
 
-    def add_method(self, name):
+    def add_method(self, name, returns=lambda: None):
         def method(*args, **kwargs):
             self._set_data(name, args, kwargs)
+            return returns()
 
         setattr(self, name, method)
+
 
 class BinderMockup(ClassMockup):
 
