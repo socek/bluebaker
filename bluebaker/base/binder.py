@@ -7,7 +7,7 @@ from bluebaker.app import Application
 
 def add_view(wrapped):
     def callback(scanner, name, obj):
-        scanner.binder.add_view(obj)
+        scanner.binder.add_view(obj) # pragma: no cover
     venusian.attach(wrapped, callback,  category='views')
     return wrapped
 

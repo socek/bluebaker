@@ -20,7 +20,7 @@ class TopWindow(QtGui.QMainWindow):
 
         def createMenu():
             if Application().settings and 'TopMenuGenerator' in Application().settings:
-                Application().settings['TopMenuGenerator'](self)
+                Application().settings['TopMenuGenerator'](self) # pragma: no cover
 
         def createSatusBar():
             self.status = QtGui.QStatusBar(self)

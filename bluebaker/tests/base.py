@@ -52,15 +52,20 @@ class TestCase(unittest.TestCase):
         self.assertEqual(exptected_data, self.getMock(name))
 
     def tearDown(self):
-        for key, mock in self.data.items():
-            if len(mock) > 0:
-                raise RuntimeError('Not all mocks were asserted!')
+        if self.currentResult.wasSuccessful():
+            for key, mock in self.data.items():
+                if len(mock) > 0:
+                    raise RuntimeError('Not all mocks were asserted!')
 
     def patch(self, obj, *args, **kwargs):
         return patch.object(obj, *self.generateMock(*args, **kwargs))
 
     def assertType(self, type_, obj):
         self.assertEqual(type_, type(obj))
+
+    def run(self, result=None):
+        self.currentResult = result # remember result for use in tearDown
+        unittest.TestCase.run(self, result) # call superclass run method
 
 
 class ControllerTest(TestCase):
