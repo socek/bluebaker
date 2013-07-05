@@ -22,3 +22,4 @@ class BinderMockup(ClassMockup):
     def __init__(self, *args, **kwargs):
         super(BinderMockup, self).__init__(*args, **kwargs)
         self.add_method('make_controller_action')
+        self.add_method('update_size_with_delay')
