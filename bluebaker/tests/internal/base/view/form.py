@@ -108,7 +108,7 @@ class FormViewTest(TestCase):
         self.view._inputs['name1'][0].setText('value1')
         data = self.view.form_data()
         self.assertEqual('ExampleForm', data['form_name'])
-        self.assertEqual('value1', data['name1'])
+        self.assertEqual(['value1', ], data['name1'])
 
     def test_form_data_multiply(self):
         self.view.set_form(ExampleFormWithList())
@@ -128,7 +128,7 @@ class FormViewTest(TestCase):
         form['name1'].message = 'message1'
         self.view.update_form()
 
-        self.assertEqual(['value3',], self.view._get_field_values('name1'))
+        self.assertEqual(['value3', ], self.view._get_field_values('name1'))
 
     def test_create_line_edit(self):
         self.view.create_line_edit('name1', True)
@@ -141,7 +141,7 @@ class FormViewTest(TestCase):
     def test_get_field_values(self):
         self.view.create_line_edit('name1', True).setText('1')
 
-        self.assertEqual(['1',], self.view._get_field_values('name1'))
+        self.assertEqual(['1', ], self.view._get_field_values('name1'))
 
     def test_get_field_value_many(self):
         self.view.create_line_edit('name1', True).setText('1')
@@ -174,7 +174,7 @@ class FieldValueTest(TestCase):
         self.view.set_form(ExampleForm())
         self.view._set_field_value('name1', 'value3')
 
-        self.assertEqual(['value3',], self.view._get_field_values('name1'))
+        self.assertEqual(['value3', ], self.view._get_field_values('name1'))
 
     def test_else_get(self):
         self.view._inputs['name_else'] = [None, ]

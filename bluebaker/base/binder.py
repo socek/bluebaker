@@ -1,3 +1,5 @@
+import inspect
+
 import venusian
 from gevent import spawn
 from greentree.binder import Binder as BaseBinder
@@ -5,9 +7,15 @@ from greentree.binder import Binder as BaseBinder
 from bluebaker.app import Application
 
 
+def get_module_name(obj):
+    module = inspect.getmodule(obj)
+    return '.'.join(module.__name__.split('.')[:-1])
+
+
 def add_view(wrapped):
     def callback(scanner, name, obj):
-        scanner.binder.add_view(obj) # pragma: no cover
+        if get_module_name(scanner.binder) == get_module_name(obj):
+            scanner.binder.add_view(obj)  # pragma: no cover
     venusian.attach(wrapped, callback,  category='views')
     return wrapped
 
@@ -26,7 +34,6 @@ class Binder(BaseBinder):
         return self._id
 
     def generate_views(self):
-        import inspect
         scanner = venusian.Scanner()
         scanner.binder = self
         module = inspect.getmodule(self)
