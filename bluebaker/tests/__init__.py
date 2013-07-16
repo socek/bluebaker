@@ -34,6 +34,12 @@ def get_all_test_suite(module=bluebaker, tests=[]):
                 raise RuntimeError(
                     'Bad test name: %s. Use one of:\n\t%s' % (name, names)
                 )
+            if test_case is None:
+                filter_names = lambda test_name: test_name.endswith(name) and test_name != name
+                names = '\n\t'.join(filter(filter_names, TestCase.alltests_dict.keys()))
+                raise RuntimeError(
+                    'Test name is ambiguous. Please provide full package name:\n\t%s' %(names,)
+                )
             test_cases.append(
                 suite.loadTestsFromTestCase(test_case)
             )
