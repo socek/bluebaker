@@ -25,8 +25,16 @@ def get_all_test_suite(module=bluebaker, tests=[]):
         return test_cases
 
     def prepere_specyfic_test_cases(suite, tests_names):
+        def unpack_name(name):
+            tab = name.split(':')
+            if len(tab) < 2:
+                tab.append(None)
+            return tab
+
         test_cases = []
         for name in tests_names:
+            name, method_name = unpack_name(name)
+
             try:
                 test_case = TestCase.alltests_dict[name]
             except KeyError:
@@ -35,14 +43,23 @@ def get_all_test_suite(module=bluebaker, tests=[]):
                     'Bad test name: %s. Use one of:\n\t%s' % (name, names)
                 )
             if test_case is None:
-                filter_names = lambda test_name: test_name.endswith(name) and test_name != name
-                names = '\n\t'.join(filter(filter_names, TestCase.alltests_dict.keys()))
+                filter_names = lambda test_name: test_name.endswith(
+                    name) and test_name != name
+                names = '\n\t'.join(filter(
+                    filter_names, TestCase.alltests_dict.keys()))
                 raise RuntimeError(
-                    'Test name is ambiguous. Please provide full package name:\n\t%s' %(names,)
+                    'Test name is ambiguous. Please provide full package name:\n\t%s' % (
+                        names,)
                 )
-            test_cases.append(
-                suite.loadTestsFromTestCase(test_case)
-            )
+            if method_name is None:
+                test_cases.append(
+                    suite.loadTestsFromTestCase(test_case)
+                )
+            else:
+                suite = unittest.TestSuite()
+                suite.addTest(test_case(method_name))
+                test_cases.append(suite)
+
         return test_cases
 
     def start_logging():
@@ -80,7 +97,7 @@ def get_all_test_suite(module=bluebaker, tests=[]):
 def runner(module):
     tests = argv[1:]
     if len(tests) == 0:
-        verbosity = 2
+        verbosity = 1
     else:
         verbosity = 2
     suite = get_all_test_suite(module, tests)
