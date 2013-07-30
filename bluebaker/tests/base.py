@@ -1,7 +1,7 @@
 import unittest
 from mock import patch
 
-from bluebaker.log import data
+from soklog import data
 from bluebaker.tests.mocker import BinderMockup
 
 
@@ -35,7 +35,7 @@ class TestCase(unittest.TestCase):
         self.log = data['log']
 
     def setUp(self):
-        self.log.clear()
+        # self.log.clear()
         self.data = {}
 
     def generateMock(self, name, clsmethod=False, return_fun=None):

@@ -3,8 +3,8 @@ import sys
 
 from PySide.QtGui import QApplication
 from gevent import sleep, spawn
+from soklog import info, init
 
-from bluebaker.log import info
 from bluebaker.singleton import Singleton
 
 
@@ -25,6 +25,7 @@ class Application(object):
             'main': main,
             'settings': settings,
         }
+        init(self.modules['main'], 'bluebaker')
 
     def set_debug(self, debug=False):
         self.debug = debug

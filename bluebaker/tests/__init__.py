@@ -6,17 +6,23 @@ from os import path
 import venusian
 
 from bluebaker.tests.base import TestCase
-import bluebaker
 
 
-def import_tests(module):
-    # we use venusian scanner for "import all tests"
-    scanner = venusian.Scanner()
-    scanner.scan(module, categories=('tests',))
+class SokTestRunner(object):
 
+    def __init__(self, module, log_file_name='test.log', log_file_dir=''):
+        self.module = module
+        self.log_file_name = log_file_name
+        self.log_file_dir = log_file_dir
+        self.tests = []
+        self.verbosity = None
 
-def get_all_test_suite(module=bluebaker, tests=[]):
-    def prepere_all_test_cases(suite):
+    def import_tests(self):
+        # we use venusian scanner for "import all tests"
+        scanner = venusian.Scanner()
+        scanner.scan(self.module, categories=('tests',))
+
+    def prepere_all_test_cases(self, suite):
         test_cases = []
         for test_case in TestCase.alltests:
             test_cases.append(
@@ -24,7 +30,7 @@ def get_all_test_suite(module=bluebaker, tests=[]):
             )
         return test_cases
 
-    def prepere_specyfic_test_cases(suite, tests_names):
+    def prepere_specyfic_test_cases(self, suite, tests_names):
         def unpack_name(name):
             tab = name.split(':')
             if len(tab) < 2:
@@ -62,13 +68,14 @@ def get_all_test_suite(module=bluebaker, tests=[]):
 
         return test_cases
 
-    def start_logging():
-        # TODO: log file should be in settings
-        from bluebaker.log import start_test_logging
-        if path.exists('data'):
-            filename = 'data/test.log'
+    def start_logging(self):
+        from soklog import init
+        if path.exists(self.log_file_dir):
+            filename = path.join(self.log_file_dir, self.log_file_name)
         else:
-            filename = 'test.log'
+            filename = self.log_file_name
+
+        init(self.module, 'sok_test')
 
         logging.basicConfig(
             level=logging.INFO,
@@ -76,29 +83,50 @@ def get_all_test_suite(module=bluebaker, tests=[]):
             filename=filename,
         )
         logging.getLogger('finlog').info('\n\t*** TESTING STARTED ***')
-        start_test_logging()
 
-    def create_qt_app():
+    def get_all_test_suite(self):
+        self.start_logging()
+        self.additional_preparation()
+        self.import_tests()
+        suite = unittest.TestLoader()
+
+        if len(self.tests) == 0:
+            return unittest.TestSuite(self.prepere_all_test_cases(suite))
+        else:
+            return unittest.TestSuite(self.prepere_specyfic_test_cases(suite, self.tests))
+
+    def additional_preparation(self):
+        pass
+
+    def update_verbosity(self, force_number=None):
+        if force_number:
+            self.force_number = force_number
+        else:
+            if len(self.tests) == 0:
+                self.verbosity = 1
+            else:
+                self.verbosity = 2
+
+    def update_tests_from_argv(self):
+        self.tests = argv[1:]
+
+    def do_tests(self):
+        self.update_tests_from_argv()
+        self.update_verbosity()
+        suite = self.get_all_test_suite()
+        unittest.TextTestRunner(verbosity=self.verbosity).run(suite)
+
+
+class BlueBakerTestRunner(SokTestRunner):
+
+    def additional_preparation(self):
+        super(BlueBakerTestRunner, self).additional_preparation()
         # need qt app for testing qwidgets
         from PySide.QtGui import QApplication
         global qtApp
         qtApp = QApplication(argv)
-    #-------------------------------------------------------------------------
-    start_logging()
-    create_qt_app()
-    import_tests(module)
-    suite = unittest.TestLoader()
-    if tests == []:
-        return unittest.TestSuite(prepere_all_test_cases(suite))
-    else:
-        return unittest.TestSuite(prepere_specyfic_test_cases(suite, tests))
 
-
-def runner(module):
-    tests = argv[1:]
-    if len(tests) == 0:
-        verbosity = 1
-    else:
-        verbosity = 2
-    suite = get_all_test_suite(module, tests)
-    unittest.TextTestRunner(verbosity=verbosity).run(suite)
+def get_all_test_suite():
+    import bluebaker
+    runner = BlueBakerTestRunner(bluebaker)
+    return runner.get_all_test_suite()

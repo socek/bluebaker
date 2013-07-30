@@ -66,14 +66,16 @@ class CmdTest(TestCase):
             self.cmd.run()
         self.app.assertMethod('run')
 
-    def test_print_info(self):
+    @patch('bluebaker.cmd.info')
+    def test_print_info(self, info):
         with self.patch(self.cmd, 'print_'):
             self.cmd.print_info()
 
         self.assertMock('print_', "Press CTRL+C to quit.")
+        info.assert_called_once_with(' === Program start ===')
 
-        with self.log.tester(self, 'info') as log:
-            log.assertLog(' === Program start ===')
+        # with self.log.tester(self, 'info') as log:
+        #     log.assertLog(' === Program start ===')
 
     def test_start_logging_with_debug(self):
         self.app.debug = True
@@ -96,7 +98,11 @@ class CmdTest(TestCase):
         self.app.settings = {
             'log_path': '/tmp/test_path'
         }
-        with self.patch(self.cmd, 'print_'):
-            self.assertRaises(AttributeError, self.cmd.start_logging)
+        with nested(
+                self.patch(self.cmd, 'print_'),
+                patch('bluebaker.cmd.start_file_logging')
+            ) as (print_mock, start_file_logging):
+            self.cmd.start_logging()
+            start_file_logging.assert_called_once_with('/tmp/test_path')
 
         self.assertMock('print_', "All logs are hidden: /tmp/test_path")

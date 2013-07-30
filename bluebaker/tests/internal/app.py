@@ -97,12 +97,11 @@ class MainAppTest(TestCase):
         with nested(
                 patch.object(app, 'createTopWindow'),
                 patch.object(Application, 'mainloop', mockup),
-        ):
+                patch('bluebaker.app.info'),
+        ) as (createTopWindow, mainloop, info):
             app.run()
-        log = self.log.get('info')
+            info.assert_called_once_with(' === Program ended ===')
         self.assertTrue(app._mainloop)
-        with self.log.tester(self, 'info') as log:
-            log.assertLog(' === Program ended ===')
 
     def test_run_KeyboardInterrupt(self):
         def side_effect():
@@ -116,14 +115,11 @@ class MainAppTest(TestCase):
         with nested(
                 patch.object(app, 'createTopWindow', side_effect=side_effect),
                 patch.object(Application, 'mainloop', mockup),
-        ):
-
+                patch('bluebaker.app.info'),
+        ) as (createTopWindow, mainloop, info):
             app.run()
-        log = self.log.get('info')
+            info.assert_called_with(' === Program ended ===')
         self.assertFalse(app._mainloop)
-        with self.log.tester(self, 'info') as log:
-            log.assertLog('\r', end='')
-            log.assertLog(' === Program ended ===')
 
     def test_close(self):
         app = Application()

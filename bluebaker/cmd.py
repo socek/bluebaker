@@ -1,5 +1,5 @@
 from __future__ import print_function
-from bluebaker.log import info, start_file_logging, start_stdout_logging
+from soklog import info, start_file_logging, start_stdout_logging
 from bluebaker.app import Application
 import argparse
 
