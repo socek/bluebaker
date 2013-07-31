@@ -11,6 +11,7 @@ install_requires = [
     'venusian',
     'mock',
     'soklog',
+    'soktest',
 ]
 
 dependency_links = [
@@ -18,6 +19,7 @@ dependency_links = [
     'https://github.com/socek/formskit/tarball/master#egg=formskit-0.1',
     'https://github.com/socek/Gallifrey/tarball/master#egg=greentree-0.1',
     'https://github.com/socek/soklog/tarball/master#egg=soklog-0.1',
+    'https://github.com/socek/soktest/tarball/master#egg=soktest-0.1'
 ]
 
 if __name__ == '__main__':
