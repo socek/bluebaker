@@ -1,3 +1,4 @@
+import sys
 from contextlib import nested
 from mock import patch
 
@@ -76,11 +77,13 @@ class MainAppTest(TestCase):
         app.additionMethod()
         self.assertMock('name', app)
 
-    def test_initQtApp(self):
-        # I can not test if the QApplication was sucessfully initalized.
-        # Only one QApplication can be initalized during program run
+    @patch('bluebaker.app.QApplication')
+    def test_initQtApp(self, qtapp):
         app = Application()
-        self.assertRaises(RuntimeError, app.initQtApp)
+        app.initQtApp()
+
+        qtapp.assert_called_once_with(sys.argv)
+        self.assertEqual(qtapp.return_value, app.qtApp)
 
     def test_createMainWindow(self):
         from bluebaker.topwindow import TopWindow
