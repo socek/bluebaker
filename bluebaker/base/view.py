@@ -82,7 +82,7 @@ class FormViewBase(View):
 
     def add_line_edit(self, name, enabled=True):
         edit = self.create_line_edit(name, enabled)
-        label = QLabel(self.form[name].label)
+        label = QLabel(self.form.field_patterns[name].label)
         self._labels[name] = label
 
         lineLay = QHBoxLayout()
@@ -110,6 +110,7 @@ class FormViewBase(View):
 
     def _set_field_value(self, name, value, index=0):
         edit = self._inputs[name][index]
+
         if type(edit) in (QLineEdit,):
             edit.setText(value)
         else:
@@ -125,13 +126,14 @@ class FormViewBase(View):
         return [get_field_value(edit) for edit in edits]
 
     def update_form(self):
-        for name, field in self.form.fields.items():
-            self._set_field_value(name, field.value)
-            if field.error:
-                edit = self._inputs[name][0] #TODO: make this more flexible, not static first element
-                tooltip_point = edit.mapToGlobal(QPoint())
-                tooltip_point -= QPoint(-10, 15)
-                QToolTip.showText(tooltip_point, field.message)
+        for name, fields in self.form.fields.items():
+            for index, field in enumerate(fields):
+                self._set_field_value(name, field.value, index)
+                if field.error:
+                    edit = self._inputs[name][index]
+                    tooltip_point = edit.mapToGlobal(QPoint())
+                    tooltip_point -= QPoint(-10, 15)
+                    QToolTip.showText(tooltip_point, field.message)
 
     def on_submit(self):
         if self.form(self.form_data()):
@@ -146,8 +148,9 @@ class FormViewBase(View):
             self.generate_form()
             self._is_form_generated = True
 
-        for name, field in self.form.fields.items():
-            self._set_field_value(name, field.value)
+        for name, fields in self.form.fields.items():
+            for index, field in enumerate(fields):
+                self._set_field_value(name, field.value, index)
 
     def generate_form(self):
         pass  # pragma: no cover

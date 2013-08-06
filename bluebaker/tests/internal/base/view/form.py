@@ -13,12 +13,6 @@ class ExampleForm(Form):
         self.addField(Field('name1', label=u'Numer'))
 
 
-class ExampleFormWithList(Form):
-
-    def createForm(self):
-        self.addFieldList(Field('name1', label=u'Numer'))
-
-
 class ExampleFormView(FormViewBase):
 
     def __init__(self, *args, **kwargs):
@@ -34,6 +28,13 @@ class ExampleFormView(FormViewBase):
 
     def fail(self):
         self._fail = True
+
+
+class ExampleFormViewDoubleLine(ExampleFormView):
+
+    def generate_form(self):
+        self.add_line_edit('name1', True)
+        self.add_line_edit('name1', True)
 
 
 class SecondExampleFormView(FormViewBase):
@@ -111,24 +112,25 @@ class FormViewTest(TestCase):
         self.assertEqual(['value1', ], data['name1'])
 
     def test_form_data_multiply(self):
-        self.view.set_form(ExampleFormWithList())
+        self.view.set_form(ExampleForm())
         self.view.create_line_edit('name1')
 
         self.view._inputs['name1'][0].setText('value1')
         self.view._inputs['name1'][1].setText('value2')
         data = self.view.form_data()
-        self.assertEqual('ExampleFormWithList', data['form_name'])
+        self.assertEqual('ExampleForm', data['form_name'])
         self.assertEqual(['value1', 'value2'], data['name1'])
 
-    def test_update_form(self):
-        form = ExampleForm()
-        self.view.set_form(form)
-        form['name1'].value = 'value3'
-        form['name1'].error = True
-        form['name1'].message = 'message1'
+    def test_update_form_multiply(self):
+        self.view.set_form(ExampleForm())
+        self.view.create_line_edit('name1')
+
+        self.view._inputs['name1'][0].setText('value1')
+        self.view._inputs['name1'][1].setText('value2')
         self.view.update_form()
 
-        self.assertEqual(['value3', ], self.view._get_field_values('name1'))
+        self.assertEqual(
+            ['value1', 'value2'], self.view._get_field_values('name1'))
 
     def test_create_line_edit(self):
         self.view.create_line_edit('name1', True)
@@ -148,6 +150,28 @@ class FormViewTest(TestCase):
         self.view.create_line_edit('name1', False).setText('2')
 
         self.assertEqual(['1', '2'], self.view._get_field_values('name1'))
+
+
+class FormViewTestDoubleLine(TestCase):
+
+    def setUp(self):
+        super(FormViewTestDoubleLine, self).setUp()
+        self.binder = MockBinder()
+        self.view = ExampleFormViewDoubleLine(self.binder)
+
+    def test_update_form(self):
+        form = ExampleForm()
+        form._assign_field_value('name1', 'value3')
+        form.fields['name1'][0].error = True
+        form.fields['name1'][0].message = 'message1'
+        form._assign_field_value('name1', 'value4')
+        form.fields['name1'][1].error = True
+        form.fields['name1'][1].message = 'message2'
+        self.view.set_form(form)
+        self.view.update_form()
+
+        self.assertEqual(
+            ['value3', 'value4'], self.view._get_field_values('name1'))
 
 
 class FieldValueTest(TestCase):
