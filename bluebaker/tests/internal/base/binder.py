@@ -1,10 +1,10 @@
-from mock import patch
+from mock import patch, MagicMock
 
 from PySide.QtCore import QSize
 import venusian
 
 from bluebaker.tests.base import TestCase
-from bluebaker.base.binder import Binder, add_view
+from bluebaker.base.binder import Binder, add_view, get_module_name
 from bluebaker.base.controller import Controller
 from bluebaker.app import Application
 
@@ -137,11 +137,21 @@ class BaseBinderTest(TestCase):
         self.assertMock('add_signal', binder.list)
 
     def test_add_view(self):
-        with patch.object(venusian, *self.generateMock('attach')):
+        with patch.object(venusian, 'attach') as attach:
             add_view({'wrapped': True})
+            attach.assert_called_once()
+            args = attach.call_args
 
-        mock_data = self.data['attach'].pop(0)
-        self.assertEqual({'wrapped': True}, mock_data[0])
+        self.assertEqual({'wrapped': True}, args[0][0])
+        self.assertEqual('views', args[1]['category'])
+
+        callback = args[0][1]
+        obj = MagicMock()
+        scanner = MagicMock()
+        scanner.binder = obj
+        callback(scanner, 'name', obj)
+        obj.add_view.assert_called_once(obj)
+
 
     def test_set_id(self):
         binder = BinderExample()
@@ -170,3 +180,7 @@ class BaseBinderTest(TestCase):
             binder.update_list()
 
         self.assertFalse(binder._list)
+
+    def test_get_module_name(self):
+        self.assertEqual(
+            'bluebaker.tests.internal.base', get_module_name(self))
