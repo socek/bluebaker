@@ -101,7 +101,7 @@ class FormViewBase(View):
 
     def form_data(self):
         data = {
-            'form_name': self.form.name,
+            'form_name': [self.form.name,],
         }
         for name, inputs in self._inputs.items():
             values = self._get_field_values(name)

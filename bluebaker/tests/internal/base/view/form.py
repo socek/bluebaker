@@ -108,7 +108,7 @@ class FormViewTest(TestCase):
         self.view.set_form(ExampleForm())
         self.view._inputs['name1'][0].setText('value1')
         data = self.view.form_data()
-        self.assertEqual('ExampleForm', data['form_name'])
+        self.assertEqual(['ExampleForm',], data['form_name'])
         self.assertEqual(['value1', ], data['name1'])
 
     def test_form_data_multiply(self):
@@ -118,7 +118,7 @@ class FormViewTest(TestCase):
         self.view._inputs['name1'][0].setText('value1')
         self.view._inputs['name1'][1].setText('value2')
         data = self.view.form_data()
-        self.assertEqual('ExampleForm', data['form_name'])
+        self.assertEqual(['ExampleForm',], data['form_name'])
         self.assertEqual(['value1', 'value2'], data['name1'])
 
     def test_update_form_multiply(self):
