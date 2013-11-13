@@ -1,12 +1,10 @@
 # -*- encoding: utf-8 -*-
 from PySide import QtGui
 
-from bluebaker.app import Application
-
 
 class TopWindow(QtGui.QMainWindow):
 
-    def __init__(self):
+    def __init__(self, parent):
         super(TopWindow, self).__init__()
 
         def createWindow():
@@ -19,13 +17,14 @@ class TopWindow(QtGui.QMainWindow):
             self.setCentralWidget(self._mdi_area)
 
         def createMenu():
-            if Application().settings and 'TopMenuGenerator' in Application().settings:
-                Application().settings['TopMenuGenerator'](self) # pragma: no cover
+            if self._parent.settings and 'TopMenuGenerator' in self._parent.settings:
+                self._parent.settings['TopMenuGenerator'](self) # pragma: no cover
 
         def createSatusBar():
             self.status = QtGui.QStatusBar(self)
             self.setStatusBar(self.status)
 
+        self._parent = parent
         createWindow()
         createMainLayout()
         createMenu()
@@ -57,5 +56,5 @@ class TopWindow(QtGui.QMainWindow):
             self.subWindows.remove(window)
 
     def closeEvent(self, event):
-        Application().close()
+        self._parent.close()
         return super(TopWindow, self).closeEvent(event)

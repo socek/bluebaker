@@ -35,7 +35,8 @@ class TopWindowTest(TestCase):
 
     def setUp(self):
         super(TopWindowTest, self).setUp()
-        self.window = TopWindow()
+        self.parent = MagicMock()
+        self.window = TopWindow(self.parent)
 
     def test_init(self):
         self.assertEqual('Finlog', self.window.windowTitle())
@@ -47,6 +48,7 @@ class TopWindowTest(TestCase):
         self.assertEqual(QMenuBar, type(self.window.menuBar()))
         self.assertEqual(QStatusBar, type(self.window.status))
         self.assertEqual(self.window.status, self.window.statusBar())
+        self.assertEqual(self.parent, self.window._parent)
 
     def test_openWindow(self):
         subwindow = SubWindowMock()

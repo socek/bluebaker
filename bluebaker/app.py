@@ -53,7 +53,7 @@ class Application(object):
 
     def createTopWindow(self):
         from bluebaker.topwindow import TopWindow
-        self.main = TopWindow()
+        self.main = TopWindow(self)
         self.main.show()
 
     def run(self):
