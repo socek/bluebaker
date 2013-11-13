@@ -3,7 +3,6 @@ from PySide.QtGui import QMdiArea, QMenuBar, QStatusBar
 
 from bluebaker.topwindow import TopWindow
 from bluebaker.tests.base import TestCase
-from bluebaker.singleton import Singleton
 
 
 class SubWindowMock(object):
@@ -135,8 +134,14 @@ class TopWindowTest(TestCase):
         self.window.removeWindow(subWindow2)
         self.assertFalse(self.window.isOpened(subWindow2))
 
-    def test_closeEvent(self):
-        app = ApplicationMock()
-        with patch.object(Singleton, '__call__', lambda x: app):
-            self.assertRaises(TypeError, self.window.closeEvent, MagicMock())
-        self.assertTrue(app._close)
+    @patch('bluebaker.topwindow.super')
+    def test_closeEvent(self, super_mock):
+        with patch.object(self.window, '_parent') as parent_mock:
+            event = MagicMock()
+            result = self.window.closeEvent(event)
+
+            parent_mock.close.assert_called_once_with()
+            super_mock.assert_called_once_with(TopWindow, self.window)
+            super_mock.return_value.closeEvent.assert_called_once_with(event)
+            self.assertEqual(
+                super_mock.return_value.closeEvent.return_value, result)

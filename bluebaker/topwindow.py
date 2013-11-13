@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from PySide import QtGui
+from __builtin__ import super
 
 
 class TopWindow(QtGui.QMainWindow):
