@@ -21,7 +21,7 @@ class ExampleFormView(FormViewBase):
         self._fail = False
 
     def generate_form(self):
-        self.add_line_edit('name1', True)
+        self.add_line_edit('name1', 'label', enabled=True)
 
     def success(self):
         self._success = True
@@ -33,14 +33,14 @@ class ExampleFormView(FormViewBase):
 class ExampleFormViewDoubleLine(ExampleFormView):
 
     def generate_form(self):
-        self.add_line_edit('name1', True)
-        self.add_line_edit('name1', True)
+        self.add_line_edit('name1', 'label', enabled=True)
+        self.add_line_edit('name1', 'label', enabled=True)
 
 
 class SecondExampleFormView(FormViewBase):
 
     def generate_form(self):
-        self.add_line_edit('name1', False)
+        self.add_line_edit('name1', 'label', enabled=False)
 
 
 class FormViewTest(TestCase):
@@ -59,14 +59,15 @@ class FormViewTest(TestCase):
 
         self.assertTrue('name1' in self.view._inputs)
         edit = self.view._inputs['name1'][0]
-        label = self.view._labels['name1']
-        self.assertTrue(edit.isEnabled())
-        self.assertEqual(QLineEdit, type(edit))
+        widget = edit.widget
+        label = edit.label
+        self.assertTrue(widget.isEnabled())
+        self.assertEqual(QLineEdit, type(widget))
         self.assertEqual(QLabel, type(label))
         self.assertEqual(QHBoxLayout, type(self.view.formLay.itemAt(0)))
         lay = self.view.formLay.itemAt(0)
         self.assertEqual(label, lay.itemAt(0).widget())
-        self.assertEqual(edit, lay.itemAt(1).widget())
+        self.assertEqual(widget, lay.itemAt(1).widget())
 
     def test_add_line_edit_disabled(self):
         self.view = SecondExampleFormView(self.binder)
@@ -74,14 +75,15 @@ class FormViewTest(TestCase):
 
         self.assertTrue('name1' in self.view._inputs)
         edit = self.view._inputs['name1'][0]
-        label = self.view._labels['name1']
-        self.assertFalse(edit.isEnabled())
-        self.assertEqual(QLineEdit, type(edit))
+        widget = edit.widget
+        label = edit.label
+        self.assertFalse(widget.isEnabled())
+        self.assertEqual(QLineEdit, type(widget))
         self.assertEqual(QLabel, type(label))
         self.assertEqual(QHBoxLayout, type(self.view.formLay.itemAt(0)))
         lay = self.view.formLay.itemAt(0)
         self.assertEqual(label, lay.itemAt(0).widget())
-        self.assertEqual(edit, lay.itemAt(1).widget())
+        self.assertEqual(widget, lay.itemAt(1).widget())
 
     def test_add_button(self):
         def method():
@@ -106,7 +108,7 @@ class FormViewTest(TestCase):
 
     def test_form_data(self):
         self.view.set_form(ExampleForm())
-        self.view._inputs['name1'][0].setText('value1')
+        self.view._inputs['name1'][0].widget.setText('value1')
         data = self.view.form_data()
         self.assertEqual(['ExampleForm',], data['form_name'])
         self.assertEqual(['value1', ], data['name1'])
@@ -115,8 +117,8 @@ class FormViewTest(TestCase):
         self.view.set_form(ExampleForm())
         self.view.create_line_edit('name1')
 
-        self.view._inputs['name1'][0].setText('value1')
-        self.view._inputs['name1'][1].setText('value2')
+        self.view._inputs['name1'][0].widget.setText('value1')
+        self.view._inputs['name1'][1].widget.setText('value2')
         data = self.view.form_data()
         self.assertEqual(['ExampleForm',], data['form_name'])
         self.assertEqual(['value1', 'value2'], data['name1'])
@@ -125,8 +127,8 @@ class FormViewTest(TestCase):
         self.view.set_form(ExampleForm())
         self.view.create_line_edit('name1')
 
-        self.view._inputs['name1'][0].setText('value1')
-        self.view._inputs['name1'][1].setText('value2')
+        self.view._inputs['name1'][0].widget.setText('value1')
+        self.view._inputs['name1'][1].widget.setText('value2')
         self.view.update_form()
 
         self.assertEqual(
@@ -137,17 +139,17 @@ class FormViewTest(TestCase):
         self.view.create_line_edit('name1', False)
 
         self.assertEqual(2, len(self.view._inputs['name1']))
-        self.assertTrue(self.view._inputs['name1'][0].isEnabled())
-        self.assertFalse(self.view._inputs['name1'][1].isEnabled())
+        self.assertTrue(self.view._inputs['name1'][0].widget.isEnabled())
+        self.assertFalse(self.view._inputs['name1'][1].widget.isEnabled())
 
     def test_get_field_values(self):
-        self.view.create_line_edit('name1', True).setText('1')
+        self.view.create_line_edit('name1', True).widget.setText('1')
 
         self.assertEqual(['1', ], self.view._get_field_values('name1'))
 
     def test_get_field_value_many(self):
-        self.view.create_line_edit('name1', True).setText('1')
-        self.view.create_line_edit('name1', False).setText('2')
+        self.view.create_line_edit('name1', True).widget.setText('1')
+        self.view.create_line_edit('name1', False).widget.setText('2')
 
         self.assertEqual(['1', '2'], self.view._get_field_values('name1'))
 
@@ -186,13 +188,13 @@ class FieldValueTest(TestCase):
         self.view._set_field_value('name1', 'value2')
         inputs = self.view._inputs['name1']
         self.assertEqual(1, len(inputs))
-        self.assertEqual('value2', inputs[0].text())
+        self.assertEqual('value2', inputs[0].value)
 
     def test_else_set(self):
         self.view._inputs['name_else'] = [None, ]
 
         self.assertRaises(
-            RuntimeError, self.view._set_field_value, 'name_else', 'value')
+            AttributeError, self.view._set_field_value, 'name_else', 'value')
 
     def test_qlineedit_get(self):
         self.view.set_form(ExampleForm())
@@ -204,7 +206,7 @@ class FieldValueTest(TestCase):
         self.view._inputs['name_else'] = [None, ]
 
         self.assertRaises(
-            RuntimeError, self.view._get_field_values, 'name_else')
+            AttributeError, self.view._get_field_values, 'name_else')
 
     def test_on_submit(self):
         self.view.form = None

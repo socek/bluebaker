@@ -1,7 +1,9 @@
-from greentree.view import View as BaseView
 from PySide.QtGui import QTableWidget, QVBoxLayout, QTableWidgetItem, QPushButton
-from PySide.QtGui import QAbstractItemView, QLineEdit, QLabel, QHBoxLayout, QToolTip
+from PySide.QtGui import QAbstractItemView, QToolTip
 from PySide.QtCore import Qt, QPoint
+from greentree.view import View as BaseView
+
+from bluebaker.base.form import LineEdit
 
 
 class View(BaseView):
@@ -71,25 +73,11 @@ class FormViewBase(View):
         self._is_form_generated = False
 
     def create_line_edit(self, name, enabled=True):
-        edit = QLineEdit()
-        if not enabled:
-            edit.setEnabled(False)
-        if not name in self._inputs:
-            self._inputs[name] = [edit]
-        else:
-            self._inputs[name].append(edit)
-        return edit
+        return LineEdit(self, name, enabled=enabled)
 
-    def add_line_edit(self, name, enabled=True):
-        edit = self.create_line_edit(name, enabled)
-        label = QLabel(self.form.field_patterns[name].label)
-        self._labels[name] = label
-
-        lineLay = QHBoxLayout()
-        lineLay.addWidget(label)
-        lineLay.addWidget(edit)
-
-        self.formLay.addLayout(lineLay)
+    def add_line_edit(self, name, label, enabled=True):
+        LineEdit(
+            self, name, self.form.field_patterns[name].label, enabled=enabled)
 
     def add_button(self, label, method):
         submitButton = QPushButton(label)
@@ -101,7 +89,7 @@ class FormViewBase(View):
 
     def form_data(self):
         data = {
-            'form_name': [self.form.name,],
+            'form_name': [self.form.name, ],
         }
         for name, inputs in self._inputs.items():
             values = self._get_field_values(name)
@@ -110,20 +98,11 @@ class FormViewBase(View):
 
     def _set_field_value(self, name, value, index=0):
         edit = self._inputs[name][index]
-
-        if type(edit) in (QLineEdit,):
-            edit.setText(value)
-        else:
-            raise RuntimeError("Could not set to an input.")
+        edit.value = value
 
     def _get_field_values(self, name):
-        def get_field_value(edit):
-            if type(edit) in (QLineEdit,):
-                return edit.text()
-            else:
-                raise RuntimeError("Could not get from an input.")
         edits = self._inputs[name]
-        return [get_field_value(edit) for edit in edits]
+        return [_input.value for _input in edits]
 
     def update_form(self):
         for name, fields in self.form.fields.items():
@@ -131,7 +110,7 @@ class FormViewBase(View):
                 self._set_field_value(name, field.value, index)
                 if field.error:
                     edit = self._inputs[name][index]
-                    tooltip_point = edit.mapToGlobal(QPoint())
+                    tooltip_point = edit.widget.mapToGlobal(QPoint())
                     tooltip_point -= QPoint(-10, 15)
                     QToolTip.showText(tooltip_point, field.message)
 
