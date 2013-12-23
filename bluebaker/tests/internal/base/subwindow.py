@@ -1,5 +1,6 @@
 from PySide.QtCore import Qt
 from PySide.QtGui import QVBoxLayout
+from mock import MagicMock
 
 from bluebaker.tests.base import TestCase
 from bluebaker.base.subwindow import Window
@@ -78,7 +79,9 @@ class ExampleWindow(Window):
 class WindowTest(TestCase):
 
     def test_init(self):
-        window = ExampleWindow()
+        app = MagicMock()
+        window = ExampleWindow(app)
+        self.assertEqual(app, window.app)
         self.assertTrue(window.testAttribute(Qt.WA_DeleteOnClose))
         self.assertEqual(200, window.minimumWidth())
         self.assertEqual(QVBoxLayout, type(window.mainLayout))
@@ -86,36 +89,42 @@ class WindowTest(TestCase):
         self.assertEqual(ExampleBinder, type(window.binder))
 
     def test_set_parent(self):
-        window = ExampleWindow()
+        app = MagicMock()
+        window = ExampleWindow(app)
         window.setParent(15)
         self.assertEqual(15, window._parent)
 
     def test_show(self):
-        window = ExampleWindow()
+        app = MagicMock()
+        window = ExampleWindow(app)
         window.show()
         self.assertTrue(window._opened)
 
     def test_close(self):
         parent = ParentMock()
-        window = ExampleWindow()
+        app = MagicMock()
+        window = ExampleWindow(app)
         window.setParent(parent)
         window.close()
         self.assertEqual(window, parent._removeWindow)
 
     def test_id(self):
-        window = ExampleWindow()
+        app = MagicMock()
+        window = ExampleWindow(app)
         self.assertEqual(ExampleBinder().get_id(), window.id)
 
     def test_open_with_opened_window(self):
+        app = MagicMock()
         Application().main = MainWindowMock(True)
-        ExampleWindow.open('action')
+        ExampleWindow.open(app, 'action')
 
         self.assertTrue(Application().main._setFocus)
         self.assertFalse(Application().main._openWindow)
 
     def test_open_without_opened_window(self):
+        app = MagicMock()
         Application().main = MainWindowMock(False)
-        ExampleWindow.open('action')
+        ExampleWindow.open(app, 'action')
 
         self.assertFalse(Application().main._setFocus)
         self.assertTrue(Application().main._openWindow)

@@ -91,11 +91,13 @@ class FormViewTest(TestCase):
 
         mock = ClickedMockup()
         with patch.object(QPushButton, 'clicked', mock):
-            self.view.add_button('label', method)
+            self.view.add_button('name', 'label', method)
             self.assertEqual(method, mock.method)
             widget = self.view.formLay.itemAt(0).widget()
             self.assertEqual('label', widget.text())
             self.assertEqual(QPushButton, type(widget))
+            button = self.view._buttons['name'][0]
+            self.assertEqual(button, widget)
 
     def test_add_submit_button(self):
         mock = ClickedMockup()

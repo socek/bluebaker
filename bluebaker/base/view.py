@@ -70,6 +70,7 @@ class FormViewBase(View):
         super(FormViewBase, self).__init__(*args, **kwargs)
         self._inputs = {}
         self._labels = {}
+        self._buttons = {}
         self._is_form_generated = False
 
     def create_line_edit(self, name, enabled=True):
@@ -79,13 +80,16 @@ class FormViewBase(View):
         LineEdit(
             self, name, self.form.field_patterns[name].label, enabled=enabled)
 
-    def add_button(self, label, method):
-        submitButton = QPushButton(label)
-        self.formLay.addWidget(submitButton)
-        submitButton.clicked.connect(method)
+    def add_button(self, name, label, method):
+        if name not in self._buttons:
+            self._buttons[name] = []
+        button = QPushButton(label)
+        self.formLay.addWidget(button)
+        button.clicked.connect(method)
+        self._buttons[name].append(button)
 
-    def add_submit_button(self, label):
-        self.add_button(label, self.on_submit)
+    def add_submit_button(self, label, name='submit'):
+        self.add_button(name, label, self.on_submit)
 
     def form_data(self):
         data = {

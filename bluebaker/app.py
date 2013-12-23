@@ -55,6 +55,10 @@ class Application(object):
         from bluebaker.topwindow import TopWindow
         self.main = TopWindow(self)
         self.main.show()
+        self.init_window()
+
+    def init_window(self):
+        pass
 
     def run(self):
         try:

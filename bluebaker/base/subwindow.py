@@ -5,7 +5,7 @@ from bluebaker.app import Application
 
 class Window(QtGui.QMdiSubWindow):
 
-    def __init__(self):
+    def __init__(self, app):
         def initWindow():
             self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
             self.setWindowFlags((self.windowFlags() | QtCore.Qt.CustomizeWindowHint) &
@@ -23,6 +23,7 @@ class Window(QtGui.QMdiSubWindow):
             self.mainLayout.addWidget(self.binder)
 
         super(Window, self).__init__()
+        self.app = app
         initWindow()
         createMainLayot()
         createBinder()
@@ -46,8 +47,8 @@ class Window(QtGui.QMdiSubWindow):
         return self.binder.get_id()
 
     @classmethod
-    def open(cls, action, *args, **kwargs):
-        window = cls()
+    def open(cls, app, action, *args, **kwargs):
+        window = cls(app)
         window.binder.make_controller_action(action, *args, **kwargs)
         if Application().main.isOpened(window):
             Application().main.getWindow(window.id).setFocus()
