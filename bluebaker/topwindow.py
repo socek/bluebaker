@@ -9,7 +9,7 @@ class TopWindow(QtGui.QMainWindow):
         super(TopWindow, self).__init__()
 
         def createWindow():
-            self.setWindowTitle(u'Finlog')
+            self.setWindowTitle(self._parent.settings['top window title'])
             self.setMinimumSize(400, 600)
             self.subWindows = []
 

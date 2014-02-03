@@ -88,6 +88,9 @@ class MainAppTest(TestCase):
     def test_createMainWindow(self):
         from bluebaker.topwindow import TopWindow
         app = Application()
+        app.settings = {
+            'top window title': 'my top window title',
+        }
         app.createTopWindow()
 
         self.assertEqual(TopWindow, type(app.main))

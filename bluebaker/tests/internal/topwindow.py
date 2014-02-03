@@ -35,10 +35,13 @@ class TopWindowTest(TestCase):
     def setUp(self):
         super(TopWindowTest, self).setUp()
         self.parent = MagicMock()
+        self.parent.settings = {
+            'top window title': 'my top window title',
+        }
         self.window = TopWindow(self.parent)
 
     def test_init(self):
-        self.assertEqual('Finlog', self.window.windowTitle())
+        self.assertEqual('my top window title', self.window.windowTitle())
         self.assertEqual(400, self.window.minimumSize().width())
         self.assertEqual(600, self.window.minimumSize().height())
         self.assertEqual([], self.window.subWindows)

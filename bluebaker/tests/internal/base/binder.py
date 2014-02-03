@@ -117,9 +117,13 @@ class BaseBinderTest(TestCase):
 
     def test_set_status(self):
         binder = BinderExample()
+        Application().settings = {
+            'top window title': 'my top window title',
+        }
         Application().createTopWindow()
 
-        with patch.object(Application().main.status, *self.generateMock('showMessage')):
+        with patch.object(Application().main.status,
+                          *self.generateMock('showMessage')):
             binder.set_status('text', 10)
 
             del Application().main
