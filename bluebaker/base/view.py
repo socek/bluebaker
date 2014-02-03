@@ -61,7 +61,10 @@ class ListView(View):
         self.clear_list()
         for element in elements:
             cols = self.get_row_from_obj(element)
-            self.append_row(cols, element.id)
+            self.append_row(cols, self.get_element_id(element))
+
+    def get_element_id(self, element):
+        return element.id
 
 
 class FormViewBase(View):

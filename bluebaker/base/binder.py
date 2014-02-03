@@ -49,6 +49,9 @@ class Binder(BaseBinder):
         return spawn(lambda: self.update_size())  # I know this is dirty,
                                      # but I do not know to make it better
 
+    def make_controller_action(self, *args, **kwargs):
+        spawn(super(Binder, self).make_controller_action, *args, **kwargs)
+
     def update_size(self):
         window = self._parent
         sizeHint = window.sizeHint()

@@ -5,6 +5,8 @@ from bluebaker.app import Application
 
 class Window(QtGui.QMdiSubWindow):
 
+    auto_resize = QtCore.Signal()
+
     def __init__(self, app):
         def initWindow():
             self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
@@ -27,6 +29,7 @@ class Window(QtGui.QMdiSubWindow):
         initWindow()
         createMainLayot()
         createBinder()
+        self.auto_resize.connect(self.on_auto_resize)
 
     def setParent(self, parent):
         self._parent = parent
@@ -41,6 +44,9 @@ class Window(QtGui.QMdiSubWindow):
     def closeEvent(self, *args, **kwargs):
         self._parent.removeWindow(self)
         return super(Window, self).closeEvent(*args, **kwargs)
+
+    def on_auto_resize(self):
+        self.resize(self.sizeHint())
 
     @property
     def id(self):

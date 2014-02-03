@@ -67,6 +67,9 @@ class BinderExample(Binder):
         super(BinderExample, self).generate_signals()
         self.add_signal(self.list)
 
+    def make_controller_action(self, *args, **kwargs):
+        return super(Binder, self).make_controller_action(*args, **kwargs)
+
 
 class BaseBinder_update_sizeTest(TestCase):
 
@@ -151,7 +154,6 @@ class BaseBinderTest(TestCase):
         scanner.binder = obj
         callback(scanner, 'name', obj)
         obj.add_view.assert_called_once(obj)
-
 
     def test_set_id(self):
         binder = BinderExample()
